@@ -9,6 +9,10 @@ var App = (function() {
         material_for_board,
         back_monitor,
         board,
+        board_name,
+        back_name,
+        image,
+        default_computer,
         camera;
 
 
@@ -57,11 +61,14 @@ var App = (function() {
         // OBJECTS
         // ============
         board = new THREE.Mesh( );
+        back_monitor = new THREE.Mesh( );
         $("#userImage").change(function () {
-            var selectedBack = scene.getObjectByName('back');
-            var selectedObj = scene.getObjectByName('ob');
-            scene.remove( selectedBack, selectedObj );
-            var image = document.createElement( 'img' );
+            default_computer = scene.getObjectByName('ob');
+            back_name = scene.getObjectByName('back');
+            board_name = scene.getObjectByName('board');
+            scene.remove( back_name, board_name, default_computer );
+
+            image = document.createElement( 'img' );
             texture_back_monitor = new THREE.Texture( image );
             image.onload = function()  {
                 texture_back_monitor.needsUpdate = true;
@@ -81,60 +88,56 @@ var App = (function() {
                 reader.readAsDataURL(userImage.files[0]);
             }
             var loader = new THREE.JSONLoader();
-            loader.load('assets/back_monitor.json', function(geometry) {
-                // var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
-                // geometry.applyMatrix(rotMat);
-                // var a_material = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
-                back_monitor = new THREE.Mesh( geometry, material_for_back_monitor );
-                back_monitor.scale.set(20, 20, 20);
-                // a_mesh.rotation.x = 0.8;
-                back_monitor.position.y = -30;
-                back_monitor.name = 'back';
-                scene.add(back_monitor);
-            });
             loader.load('assets/board.json', function(geometry) {
-                var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
-                // geometry.applyMatrix(rotMat);
                 material_for_board = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
                 board = new THREE.Mesh( geometry, material_for_board );
                 board.scale.set(20, 20, 20);
                 // a_mesh.rotation.x = 0.8;
                 board.position.y = -30;
-                board.name = 'ob';
+                // board.rotation.y += 1;
+                board.name = 'board';
                 scene.add(board);
+
+                loader.load('assets/back_monitor.json', function(geometry) {
+                    back_monitor = new THREE.Mesh( geometry, material_for_back_monitor);
+                    back_monitor.scale.set(20, 20, 20);
+                    back_monitor.position.y = -30;
+                    back_monitor.name = 'back';
+
+                    scene.add(back_monitor);
+                });
             });
+
+
         });
 //==========================================================================================
         var loader = new THREE.JSONLoader();
-        loader.load('assets/back_monitor.json', function(geometry) {
-            var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
-            // geometry.applyMatrix(rotMat);
-texture_back_monitor = THREE.ImageUtils.loadTexture( 'assets/tex.jpg' );
-    texture_back_monitor.anisotropy = renderer.getMaxAnisotropy();
 
-    material_for_back_monitor = new THREE.MeshBasicMaterial( { map: texture_back_monitor } );
-
-
-            back_monitor = new THREE.Mesh( geometry, material_for_back_monitor);
-            back_monitor.scale.set(20, 20, 20);
-            // a_mesh.rotation.x = 0.8;
-            back_monitor.position.y = -30;
-            back_monitor.rotation.y += 0.005
-            // a_mesh.name = 'ob';
-            scene.add(back_monitor);
-        });
         loader.load('assets/board.json', function(geometry) {
-            var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
-            // geometry.applyMatrix(rotMat);
-            material_for_board = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
-            board = new THREE.Mesh( geometry, material_for_board );
-            board.scale.set(20, 20, 20);
-            // a_mesh.rotation.x = 0.8;
-            board.position.y = -30;
-            board.rotation.y += 0.005;
-            board.name = 'ob';
-            scene.add(board);
-        });
+                material_for_board = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
+                board = new THREE.Mesh( geometry, material_for_board );
+                board.scale.set(20, 20, 20);
+                // a_mesh.rotation.x = 0.8;
+                board.position.y = -30;
+                // board.rotation.y += 1;
+                board.name = 'ob';
+                scene.add(board);
+
+                // loader.load('assets/back_monitor.json', function(geometry) {
+                //     texture_back_monitor = THREE.ImageUtils.loadTexture( 'assets/tex.jpg' );
+                //     texture_back_monitor.anisotropy = renderer.getMaxAnisotropy();
+
+                //     material_for_back_monitor = new THREE.MeshBasicMaterial( { map: texture_back_monitor } );
+
+
+                //     back_monitor = new THREE.Mesh( geometry, material_for_back_monitor);
+                //     back_monitor.scale.set(20, 20, 20);
+                //     back_monitor.position.y = -30;
+                //     // back_monitor.rotation.y += 1;
+
+                //     scene.add(back_monitor);
+                // });
+            });
 
 
         // initiate
@@ -154,10 +157,10 @@ texture_back_monitor = THREE.ImageUtils.loadTexture( 'assets/tex.jpg' );
     };
 
     var render = function() {
-        // if(back_monitor != null && board != null) {
-        //     back_monitor.rotation.y += 0.005;
-        //     board.rotation.y += 0.005;
-        // }
+        if(back_monitor != null && board != null) {
+            back_monitor.rotation.y += 0.005;
+            board.rotation.y += 0.005;
+        }
         renderer.render( scene, camera );
         requestAnimationFrame( render );//call render() function itself
     };
