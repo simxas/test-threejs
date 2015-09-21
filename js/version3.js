@@ -4,9 +4,10 @@ var App = (function() {
     var scene,
         renderer,
         light,
-        texture,
-        material,
-        a_mesh,
+        texture_back_monitor,
+        material_for_back_monitor,
+        material_for_board,
+        back_monitor,
         board,
         camera;
 
@@ -55,69 +56,83 @@ var App = (function() {
         //=============
         // OBJECTS
         // ============
-        // a_mesh = new THREE.Mesh( );
-        // $("#userImage").change(function () {
-        //     var selectedObject = scene.getObjectByName('ob');
-        //     scene.remove( selectedObject );
-        //     var image = document.createElement( 'img' );
-        //     texture = new THREE.Texture( image );
-        //     image.onload = function()  {
-        //         texture.needsUpdate = true;
-        //     };
-        //     texture.anisotropy = renderer.getMaxAnisotropy();
+        board = new THREE.Mesh( );
+        $("#userImage").change(function () {
+            var selectedBack = scene.getObjectByName('back');
+            var selectedObj = scene.getObjectByName('ob');
+            scene.remove( selectedBack, selectedObj );
+            var image = document.createElement( 'img' );
+            texture_back_monitor = new THREE.Texture( image );
+            image.onload = function()  {
+                texture_back_monitor.needsUpdate = true;
+            };
+            texture_back_monitor.anisotropy = renderer.getMaxAnisotropy();
 
-        //     material = new THREE.MeshBasicMaterial( { map: texture } );
+            material_for_back_monitor = new THREE.MeshBasicMaterial( { map: texture_back_monitor } );
 
-        //     var userImage = $("#userImage")[0];
-        //     if (userImage.files && userImage.files[0]) {
-        //         var reader = new FileReader();
+            var userImage = $("#userImage")[0];
+            if (userImage.files && userImage.files[0]) {
+                var reader = new FileReader();
 
-        //         reader.onload = function (e) {
-        //             image.src = e.target.result;
-        //         };
+                reader.onload = function (e) {
+                    image.src = e.target.result;
+                };
 
-        //         reader.readAsDataURL(userImage.files[0]);
-        //     }
-        //     var loader = new THREE.JSONLoader();
-        //     loader.load('assets/samsung2.json', function(geometry) {
-        //         var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
-        //         // geometry.applyMatrix(rotMat);
-        //         var a_material = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
-        //         a_mesh = new THREE.Mesh( geometry, material );
-        //         a_mesh.scale.set(20, 20, 20);
-        //         // a_mesh.rotation.x = 0.8;
-        //         a_mesh.position.y = -30;
-        //         a_mesh.name = 'ob';
-        //         scene.add(a_mesh);
-        //     });
-        // });
+                reader.readAsDataURL(userImage.files[0]);
+            }
+            var loader = new THREE.JSONLoader();
+            loader.load('assets/back_monitor.json', function(geometry) {
+                // var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
+                // geometry.applyMatrix(rotMat);
+                // var a_material = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
+                back_monitor = new THREE.Mesh( geometry, material_for_back_monitor );
+                back_monitor.scale.set(20, 20, 20);
+                // a_mesh.rotation.x = 0.8;
+                back_monitor.position.y = -30;
+                back_monitor.name = 'back';
+                scene.add(back_monitor);
+            });
+            loader.load('assets/board.json', function(geometry) {
+                var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
+                // geometry.applyMatrix(rotMat);
+                material_for_board = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
+                board = new THREE.Mesh( geometry, material_for_board );
+                board.scale.set(20, 20, 20);
+                // a_mesh.rotation.x = 0.8;
+                board.position.y = -30;
+                board.name = 'ob';
+                scene.add(board);
+            });
+        });
 //==========================================================================================
         var loader = new THREE.JSONLoader();
-        loader.load('assets/monitor.json', function(geometry) {
+        loader.load('assets/back_monitor.json', function(geometry) {
             var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
             // geometry.applyMatrix(rotMat);
-texture = THREE.ImageUtils.loadTexture( 'assets/tex.jpg' );
-    texture.anisotropy = renderer.getMaxAnisotropy();
+texture_back_monitor = THREE.ImageUtils.loadTexture( 'assets/tex.jpg' );
+    texture_back_monitor.anisotropy = renderer.getMaxAnisotropy();
 
-    material = new THREE.MeshBasicMaterial( { map: texture } );
+    material_for_back_monitor = new THREE.MeshBasicMaterial( { map: texture_back_monitor } );
 
 
-            a_mesh = new THREE.Mesh( geometry, material);
-            a_mesh.scale.set(20, 20, 20);
+            back_monitor = new THREE.Mesh( geometry, material_for_back_monitor);
+            back_monitor.scale.set(20, 20, 20);
             // a_mesh.rotation.x = 0.8;
-            a_mesh.position.y = -30;
+            back_monitor.position.y = -30;
+            back_monitor.rotation.y += 0.005
             // a_mesh.name = 'ob';
-            scene.add(a_mesh);
+            scene.add(back_monitor);
         });
         loader.load('assets/board.json', function(geometry) {
             var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
             // geometry.applyMatrix(rotMat);
-
-            board = new THREE.Mesh( geometry);
+            material_for_board = new THREE.MeshLambertMaterial( { color: '#4499DC' } );
+            board = new THREE.Mesh( geometry, material_for_board );
             board.scale.set(20, 20, 20);
             // a_mesh.rotation.x = 0.8;
             board.position.y = -30;
-            // a_mesh.name = 'ob';
+            board.rotation.y += 0.005;
+            board.name = 'ob';
             scene.add(board);
         });
 
@@ -139,10 +154,10 @@ texture = THREE.ImageUtils.loadTexture( 'assets/tex.jpg' );
     };
 
     var render = function() {
-        if(a_mesh != null && board != null) {
-            a_mesh.rotation.y += 0.005;
-            board.rotation.y += 0.005;
-        }
+        // if(back_monitor != null && board != null) {
+        //     back_monitor.rotation.y += 0.005;
+        //     board.rotation.y += 0.005;
+        // }
         renderer.render( scene, camera );
         requestAnimationFrame( render );//call render() function itself
     };
