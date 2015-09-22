@@ -95,7 +95,7 @@ var App = (function() {
         loader.load('assets/uvmapping.json', function(geometry, materials) {
             var rotMat = new THREE.Matrix4().makeRotationZ(Math.PI);
             // geometry.applyMatrix(rotMat);
-var texture2 = THREE.ImageUtils.loadTexture( 'assets/texture.jpg' );
+var texture2 = THREE.ImageUtils.loadTexture( 'assets/beach.jpg' );
     texture2.anisotropy = renderer.getMaxAnisotropy();
 
     var material2 = new THREE.MeshBasicMaterial( { map: texture2 } );
